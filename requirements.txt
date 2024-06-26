@@ -2,3 +2,4 @@ streamlit
 assemblyai
 python-docx
 streamlit-quill
+streamlit_javascript
