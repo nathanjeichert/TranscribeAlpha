@@ -1,0 +1,4 @@
+streamlit
+assemblyai
+python-docx
+streamlit-quill
