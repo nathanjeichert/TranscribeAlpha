@@ -274,7 +274,7 @@ def replace_placeholder_text(element, placeholder, replacement):
 def create_docx(title_data, transcript_turns):
     """Creates a Word document (.docx) from the transcript turns (list of TranscriptTurn) using a template."""
     try:
-        doc = Document("gemini_transcriber/transcript_template.docx") # Load the template
+        doc = Document("transcript_template.docx") # Load the template
     except Exception as e:
         st.error(f"Error loading template 'gemini_transcriber/transcript_template.docx': {e}")
         return None
