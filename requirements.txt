@@ -1,5 +1,6 @@
 streamlit
 google-generativeai
 python-docx
-ffmpeg
+ffmpeg-python
 pydub
+pydantic
