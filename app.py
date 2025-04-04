@@ -142,11 +142,11 @@ def generate_transcript(gemini_file, speaker_name_list=None):
         model_name=MODEL_NAME,
         # Set safety settings to BLOCK_NONE for all categories
         safety_settings={
-            genai.types.HarmCategory.HARASSMENT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            genai.types.HarmCategory.HATE_SPEECH: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            genai.types.HarmCategory.SEXUALLY_EXPLICIT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            genai.types.HarmCategory.DANGEROUS_CONTENT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            genai.types.HarmCategory.CIVIC_INTEGRITY: genai.types.HarmBlockThreshold.BLOCK_NONE
+            genai.types.HarmCategory_HARASSMENT: genai.types.HarmBlockThreshold.BLOCK_NONE,
+            genai.types.HarmCategory_HATE_SPEECH: genai.types.HarmBlockThreshold.BLOCK_NONE,
+            genai.types.HarmCategory_SEXUALLY_EXPLICIT: genai.types.HarmBlockThreshold.BLOCK_NONE,
+            genai.types.HarmCategory_DANGEROUS_CONTENT: genai.types.HarmBlockThreshold.BLOCK_NONE,
+            genai.types.HarmCategory_CIVIC_INTEGRITY: genai.types.HarmBlockThreshold.BLOCK_NONE
         }
     )
 
