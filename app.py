@@ -92,8 +92,8 @@ def upload_to_gemini(file_path, mime_type):
     """Uploads a file to the Gemini File API and handles potential errors."""
     st.info(f"Uploading {os.path.basename(file_path)} to Gemini...")
     try:
-        # Use client.files.upload
-        gemini_file = client.files.upload(file=file_path, mime_type=mime_type) # Use 'file' parameter
+        # Use client.files.upload (mime_type is likely inferred or not needed as direct arg)
+        gemini_file = client.files.upload(file=file_path) # Removed mime_type argument
         st.info(f"File uploaded: {gemini_file.name}, processing...")
 
         # Poll for file readiness
