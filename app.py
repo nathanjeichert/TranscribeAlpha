@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 from google.genai import types
 from google.api_core import exceptions as google_exceptions
 from docx import Document
