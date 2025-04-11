@@ -30,17 +30,18 @@ except KeyError:
     st.error("GEMINI_API_KEY not found in Streamlit secrets. Please add it to your secrets file or environment variables.")
     st.stop()
 
+# --- Initialize Gemini Client ---
 try:
-    genai.configure(api_key=API_KEY)
-    # Optional: Test configuration by listing models
-    # list(genai.list_models()) # This might list many models, maybe just proceed
+    client = genai.Client(api_key=API_KEY)
+    # Optional: Test configuration by listing models (can be slow)
+    # client.models.list()
 except google_exceptions.PermissionDenied:
-    st.error("Permission denied configuring Gemini. Please check your API key (loaded from secrets).")
-    st.stop() # Stop execution if configuration fails
+    st.error("Permission denied initializing Gemini client. Please check your API key (loaded from secrets).")
+    st.stop() # Stop execution if initialization fails
 except Exception as e:
-    st.error(f"Failed to configure Gemini client: {e}")
-    st.stop() # Stop execution if configuration fails
-
+    st.error(f"Failed to initialize Gemini client: {e}")
+    st.error(traceback.format_exc()) # Log traceback for debugging
+    st.stop() # Stop execution if initialization fails
 
 
 # --- Pydantic Schema ---
@@ -91,8 +92,8 @@ def upload_to_gemini(file_path, mime_type):
     """Uploads a file to the Gemini File API and handles potential errors."""
     st.info(f"Uploading {os.path.basename(file_path)} to Gemini...")
     try:
-        # Use genai.upload_file directly
-        gemini_file = genai.upload_file(path=file_path, mime_type=mime_type)
+        # Use client.files.upload
+        gemini_file = client.files.upload(file=file_path, mime_type=mime_type) # Use 'file' parameter
         st.info(f"File uploaded: {gemini_file.name}, processing...")
 
         # Poll for file readiness
@@ -104,7 +105,8 @@ def upload_to_gemini(file_path, mime_type):
         while file_state == "PROCESSING" and retries > 0:
             time.sleep(sleep_time) # Wait before checking status again
             try:
-                file_info = genai.get_file(name=gemini_file.name)
+                # Use client.files.get
+                file_info = client.files.get(name=gemini_file.name)
             except Exception as get_err:
                  st.warning(f"Error checking file status (will retry): {get_err}")
                  retries -=1
@@ -120,7 +122,8 @@ def upload_to_gemini(file_path, mime_type):
             st.error(f"File processing failed or timed out after polling. Final state: {file_state}")
             # Attempt to delete the failed file
             try:
-                genai.delete_file(name=gemini_file.name)
+                # Use client.files.delete
+                client.files.delete(name=gemini_file.name)
                 st.warning(f"Attempted to delete failed/timed-out file: {gemini_file.name}")
             except Exception as del_e:
                 st.warning(f"Could not delete failed/timed-out file {gemini_file.name}: {del_e}")
@@ -143,32 +146,31 @@ def generate_transcript(gemini_file, speaker_name_list=None):
     """Generates transcript using the Gemini model, always requesting structured JSON output."""
 
     st.info("Generating transcript (requesting JSON)...")
-    model = genai.GenerativeModel(
-        model_name=MODEL_NAME,
-        # Set safety settings to BLOCK_NONE for all categories using the types module
-        safety_settings=[
-            types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-            types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-            types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-            types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-             types.SafetySetting(
-                category=types.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
-                threshold=types.HarmBlockThreshold.BLOCK_NONE,
-            ),
-        ]
-    )
+
+    # Define safety settings (remains the same structure)
+    safety_settings=[
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+         types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+    ]
+
 
     # Construct the prompt, mentioning speakers are optional
     if speaker_name_list:
@@ -189,9 +191,8 @@ def generate_transcript(gemini_file, speaker_name_list=None):
 
         )
 
-    # Always configure for JSON output using the schema
-    # Note: GenerationConfig might still be under types, keeping it as is for now unless error occurs
-    generation_config=genai.types.GenerationConfig(
+    # Define generation config for JSON output using the schema
+    generation_config=types.GenerateContentConfig( # Use types directly
             response_mime_type="application/json",
             response_schema=list[TranscriptTurn] # Use the updated Pydantic model
         )
@@ -200,11 +201,16 @@ def generate_transcript(gemini_file, speaker_name_list=None):
     st.caption(f"Prompt being sent to Gemini (excluding file): {prompt}") # Show the updated prompt
 
     try:
-        # Add timeout to request_options (e.g., 10 minutes = 600 seconds)
-        response = model.generate_content(
+        # Use client.models.generate_content
+        # Pass safety_settings and generation_config within a single 'config' object
+        response = client.models.generate_content(
+            model=MODEL_NAME, # Specify model here
             contents=contents,
-            generation_config=generation_config,
-            request_options={"timeout": 600}
+            config=types.GenerateContentConfig( # Combine configs
+                safety_settings=safety_settings,
+                generation_config=generation_config,
+            ),
+            request_options={"timeout": 600} # Keep request options separate
         )
 
         # Debug: Print raw response text if needed
@@ -530,8 +536,8 @@ if generate_button and 'uploaded_file_info' in st.session_state:
                 if gemini_file_to_delete:
                     try:
                         st.info(f"Cleaning up uploaded file: {gemini_file_to_delete.name}...")
-                        # Use genai.delete_file directly
-                        genai.delete_file(name=gemini_file_to_delete.name)
+                        # Use client.files.delete directly
+                        client.files.delete(name=gemini_file_to_delete.name)
                         st.success("Cleanup successful.")
                     except Exception as e:
                         st.warning(f"Could not delete uploaded file {gemini_file_to_delete.name}: {e}")
