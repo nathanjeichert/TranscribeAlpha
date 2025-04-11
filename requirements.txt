@@ -4,3 +4,4 @@ python-docx
 ffmpeg-python
 pydub
 pydantic
+google_exceptions
