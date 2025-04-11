@@ -140,14 +140,29 @@ def generate_transcript(gemini_file, speaker_name_list=None):
     st.info("Generating transcript (requesting JSON)...")
     model = genai.GenerativeModel(
         model_name=MODEL_NAME,
-        # Set safety settings to BLOCK_NONE for all categories
-        safety_settings={
-            genai.types.HarmCategory.HARM_CATEGORY_HARASSMENT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            genai.types.HarmCategory.HARM_CATEGORY_HATE_SPEECH: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            genai.types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            genai.types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: genai.types.HarmBlockThreshold.BLOCK_NONE,
-            genai.types.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY: genai.types.HarmBlockThreshold.BLOCK_NONE
-        }
+        # Set safety settings to BLOCK_NONE for all categories using the correct list format
+        safety_settings=[
+            genai.types.SafetySetting(
+                category=genai.types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            genai.types.SafetySetting(
+                category=genai.types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            genai.types.SafetySetting(
+                category=genai.types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+            genai.types.SafetySetting(
+                category=genai.types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+             genai.types.SafetySetting(
+                category=genai.types.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            ),
+        ]
     )
 
     # Construct the prompt, mentioning speakers are optional
