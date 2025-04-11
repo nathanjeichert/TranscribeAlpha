@@ -140,27 +140,27 @@ def generate_transcript(gemini_file, speaker_name_list=None):
     st.info("Generating transcript (requesting JSON)...")
     model = genai.GenerativeModel(
         model_name=MODEL_NAME,
-        # Set safety settings to BLOCK_NONE for all categories using the correct list format
+        # Set safety settings to BLOCK_NONE for all categories using direct genai imports for all components
         safety_settings=[
-            genai.types.SafetySetting(
-                category=genai.types.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            genai.SafetySetting(
+                category=genai.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
             ),
-            genai.types.SafetySetting(
-                category=genai.types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            genai.SafetySetting(
+                category=genai.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
             ),
-            genai.types.SafetySetting(
-                category=genai.types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            genai.SafetySetting(
+                category=genai.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
             ),
-            genai.types.SafetySetting(
-                category=genai.types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+            genai.SafetySetting(
+                category=genai.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
             ),
-             genai.types.SafetySetting(
-                category=genai.types.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
-                threshold=genai.types.HarmBlockThreshold.BLOCK_NONE,
+             genai.SafetySetting(
+                category=genai.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
             ),
         ]
     )
@@ -185,6 +185,7 @@ def generate_transcript(gemini_file, speaker_name_list=None):
         )
 
     # Always configure for JSON output using the schema
+    # Note: GenerationConfig might still be under types, keeping it as is for now unless error occurs
     generation_config=genai.types.GenerationConfig(
             response_mime_type="application/json",
             response_schema=list[TranscriptTurn] # Use the updated Pydantic model
