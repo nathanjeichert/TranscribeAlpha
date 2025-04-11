@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+from google.genai import types
 from google.api_core import exceptions as google_exceptions
 from docx import Document
 from docx.shared import Inches, Pt
@@ -13,11 +14,13 @@ from pydantic import BaseModel, ValidationError
 import json
 import traceback # For detailed error logging
 
+
 # --- Configuration ---
 # API_KEY is now read from Streamlit secrets
 MODEL_NAME = "gemini-2.5-pro-exp-03-25"
 SUPPORTED_VIDEO_TYPES = ["mp4", "mov", "avi", "mkv"]
 SUPPORTED_AUDIO_TYPES = ["mp3", "wav", "m4a", "flac", "ogg", "aac", "aiff"] # Add more if needed by Gemini/pydub
+
 
 # --- Global Configuration ---
 # Load API key from Streamlit secrets
@@ -39,10 +42,12 @@ except Exception as e:
     st.stop() # Stop execution if configuration fails
 
 
+
 # --- Pydantic Schema ---
 class TranscriptTurn(BaseModel):
   speaker: str
   text: str # Renamed from dialogue
+
 
 
 # --- Helper Functions ---
@@ -140,27 +145,27 @@ def generate_transcript(gemini_file, speaker_name_list=None):
     st.info("Generating transcript (requesting JSON)...")
     model = genai.GenerativeModel(
         model_name=MODEL_NAME,
-        # Set safety settings to BLOCK_NONE for all categories using direct genai imports for all components
+        # Set safety settings to BLOCK_NONE for all categories using the types module
         safety_settings=[
-            genai.SafetySetting(
-                category=genai.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
             ),
-            genai.SafetySetting(
-                category=genai.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
             ),
-            genai.SafetySetting(
-                category=genai.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
             ),
-            genai.SafetySetting(
-                category=genai.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
             ),
-             genai.SafetySetting(
-                category=genai.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
-                threshold=genai.HarmBlockThreshold.BLOCK_NONE,
+             types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+                threshold=types.HarmBlockThreshold.BLOCK_NONE,
             ),
         ]
     )
