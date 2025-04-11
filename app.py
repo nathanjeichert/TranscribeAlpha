@@ -13,8 +13,6 @@ from pydub import AudioSegment
 from pydantic import BaseModel, ValidationError
 import json
 import traceback # For detailed error logging
-
-
 # --- Configuration ---
 # API_KEY is now read from Streamlit secrets
 MODEL_NAME = "gemini-2.5-pro-exp-03-25"
@@ -48,13 +46,7 @@ except Exception as e:
 class TranscriptTurn(BaseModel):
   speaker: str
   text: str # Renamed from dialogue
-
-
-
-# --- Helper Functions ---
-
-# Removed merge_consecutive_turns function
-
+  
 def convert_video_to_audio(input_path, output_path, format="mp3"):
     """Converts video file to audio using ffmpeg."""
     try:
@@ -215,19 +207,6 @@ def generate_transcript(gemini_file, speaker_name_list=None):
 
         # Check for empty or blocked response FIRST
         # Handle potential lack of 'parts' if blocked early
-        try:
-            if not response.parts:
-                st.warning("Transcript generation resulted in an empty or blocked response.")
-                if hasattr(response, 'prompt_feedback'):
-                     st.warning(f"Prompt Feedback: {response.prompt_feedback}")
-                else:
-                     st.warning("No prompt feedback available.")
-                return None
-        except ValueError: # Handle cases where response might not have 'parts' (e.g., internal errors)
-             st.error("Error accessing response parts. The generation might have failed.")
-             st.warning(f"Prompt Feedback (if available): {getattr(response, 'prompt_feedback', 'N/A')}")
-             return None
-
         # Always process as JSON now
         try:
             transcript_data = json.loads(response.text)
