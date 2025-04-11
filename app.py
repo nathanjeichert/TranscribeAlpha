@@ -191,24 +191,21 @@ def generate_transcript(gemini_file, speaker_name_list=None):
 
         )
 
-    # Define generation config for JSON output using the schema
-    generation_config=types.GenerateContentConfig( # Use types directly
-            response_mime_type="application/json",
-            response_schema=list[TranscriptTurn] # Use the updated Pydantic model
-        )
+    # Define contents for the request
     contents=[prompt, gemini_file]
 
     st.caption(f"Prompt being sent to Gemini (excluding file): {prompt}") # Show the updated prompt
 
     try:
         # Use client.models.generate_content
-        # Pass safety_settings and generation_config within a single 'config' object
+        # Pass all config settings directly within a single GenerateContentConfig object
         response = client.models.generate_content(
             model=MODEL_NAME, # Specify model here
             contents=contents,
-            config=types.GenerateContentConfig( # Combine configs
+            config=types.GenerateContentConfig(
                 safety_settings=safety_settings,
-                generation_config=generation_config,
+                response_mime_type="application/json", # Moved from nested config
+                response_schema=list[TranscriptTurn]  # Moved from nested config
             ),
             request_options={"timeout": 600} # Keep request options separate
         )
