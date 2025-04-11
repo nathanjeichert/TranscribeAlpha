@@ -207,7 +207,6 @@ def generate_transcript(gemini_file, speaker_name_list=None):
                 response_mime_type="application/json", # Moved from nested config
                 response_schema=list[TranscriptTurn]  # Moved from nested config
             ),
-            request_options={"timeout": 600} # Keep request options separate
         )
 
         # Debug: Print raw response text if needed
