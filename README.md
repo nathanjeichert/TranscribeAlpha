@@ -2,6 +2,17 @@
 
 A simple transcript generator using Google's Gemini models. The original Streamlit prototype has been replaced with a small FastAPI backend and a static HTML front-end.
 
+## Cloning the Repository
+
+You can obtain the source by cloning the Git repository:
+
+```bash
+git clone <REPO_URL>.git
+```
+
+Replace `<REPO_URL>` with the actual repository URL. The `.git` suffix ensures
+Git fetches the repository history properly for reuse.
+
 ## Running Locally
 
 1. Install system packages listed in `packages.txt` (ffmpeg and libsndfile1).
