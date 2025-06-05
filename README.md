@@ -1,6 +1,6 @@
 # TranscribeAlpha
 
-A simple transcript generator using Google's Gemini models. The original Streamlit prototype has been replaced with a small FastAPI backend and a static HTML front-end.
+A simple transcript generator using Google's Gemini models. The original Streamlit prototype has been replaced with a small FastAPI backend and a SvelteKit front-end that is built to static files.
 
 ## Running Locally
 
@@ -11,19 +11,28 @@ A simple transcript generator using Google's Gemini models. The original Streaml
 pip install -r requirements.txt
 ```
 
-3. Export your Gemini API key:
+3. Install frontend dependencies and build the SvelteKit app:
+
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+4. Export your Gemini API key:
 
 ```bash
 export GEMINI_API_KEY="YOUR_KEY_HERE"
 ```
 
-4. Start the server:
+5. Start the server:
 
 ```bash
 uvicorn backend.server:app --reload
 ```
 
-5. Open [http://localhost:8000](http://localhost:8000) in your browser and interact with the app.
+6. Open [http://localhost:8000](http://localhost:8000) in your browser and interact with the app.
 
 ## Notes
 
