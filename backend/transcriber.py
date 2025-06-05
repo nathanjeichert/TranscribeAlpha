@@ -15,7 +15,7 @@ import ffmpeg
 from pydub import AudioSegment
 from pydantic import BaseModel, ValidationError
 
-MODEL_NAME = "gemini-2.5-pro-exp-03-25"
+MODEL_NAME = "gemini-2.5-flash-preview-05-20"
 SUPPORTED_VIDEO_TYPES = ["mp4", "mov", "avi", "mkv"]
 SUPPORTED_AUDIO_TYPES = ["mp3", "wav", "m4a", "flac", "ogg", "aac", "aiff"]
 
