@@ -59,6 +59,6 @@ async def transcribe(
     encoded = base64.b64encode(docx_bytes).decode()
     return JSONResponse({"transcript": transcript_text, "docx_base64": encoded})
 
-frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
+frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "build")
 app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
 
