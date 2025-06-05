@@ -23,7 +23,7 @@ export GEMINI_API_KEY="YOUR_KEY_HERE"
 uvicorn backend.server:app --reload
 ```
 
-5. Open `frontend/index.html` in your browser and interact with the app.
+5. Open [http://localhost:8000](http://localhost:8000) in your browser and interact with the app.
 
 ## Notes
 
